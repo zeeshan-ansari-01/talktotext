@@ -113,10 +113,5 @@ Shown on the Groq console for this account. These can change, check `console.gro
 
 ## Status
 
-**Tested:** register, login, wrong password, current user, protected routes, plan guard, blog generation from text, and ownership checks between two users.
-
-**Written but not tested yet:** transcription with a real audio file (it will be tested through the frontend upload form).
-
-**Not implemented:** payments. Stripe is invite-only in India and Razorpay needs a PAN even for test mode, so no payment provider is connected. In development a user's plan is set manually in the database.
-
-**Not done yet:** automated tests, deployment configuration.
+- **Working and tested:** authentication, protected routes, plan limits, blog generation, and per-user post ownership.
+- **Not available yet:** payments. No payment provider is connected, so plans are assigned manually in the development database.
