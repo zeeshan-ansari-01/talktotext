@@ -4,6 +4,14 @@ import Post from "../models/Post.js";
 import { registerSchema, loginSchema } from "../validators/authValidator.js";
 import { setAuthCookie, clearAuthCookie } from "../utils/token.js";
 
+// Plan server se nikalta hai: sirf active subscription wala hi Basic/Pro hota hai
+const getPlan = (user) => {
+  if (user.status !== "active") return "starter";
+  if (user.priceId === process.env.PLAN_PRO_ID) return "pro";
+  if (user.priceId === process.env.PLAN_BASIC_ID) return "basic";
+  return "starter";
+};
+
 // Frontend ko sirf safe fields bhejte hain (passwordHash kabhi nahi)
 const toPublicUser = (user) => ({
   id: user._id,
@@ -11,11 +19,13 @@ const toPublicUser = (user) => ({
   email: user.email,
   status: user.status,
   priceId: user.priceId,
+  plan: getPlan(user),
 });
 
 export const register = async (req, res, next) => {
   try {
     const { name, email, password } = registerSchema.parse(req.body);
+    const displayName = name || email.split("@")[0].slice(0, 60);
 
     const exists = await User.findOne({ email });
     if (exists) {
@@ -25,7 +35,7 @@ export const register = async (req, res, next) => {
     }
 
     const passwordHash = await bcrypt.hash(password, 12);
-    const user = await User.create({ name, email, passwordHash });
+    const user = await User.create({ name: displayName, email, passwordHash });
 
     setAuthCookie(res, user._id);
     res.status(201).json({ success: true, user: toPublicUser(user) });
